@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ============================
+   APP LAYOUT
+============================ */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ============================
+   SIDEBAR
+============================ */
+.sidebar {
+  background-color: #18181b;
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #27272a;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: all 0.3s ease-in-out;
+  z-index: 10;
+}
+
+/* When collapsed, shrink smoothly */
+.sidebar.collapsed {
+  width: 72px;
+  min-width: 72px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #27272a;
+  transition: all 0.3s ease;
+}
+
+/* Hide title when collapsed */
+.sidebar.collapsed .sidebar-header h1 {
+  display: none;
+}
+
+.sidebar-header h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fafafa;
+  white-space: nowrap;
+}
+
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: #a1a1aa;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.collapse-btn:hover {
+  color: #fff;
+}
+
+/* ============================
+   NAVIGATION
+============================ */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  background: transparent;
+  border: none;
+  color: #e4e4e7;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-size: 0.95rem;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background-color: #27272a;
+  color: #fff;
+}
+
+/* Hide text when collapsed */
+.sidebar.collapsed .nav-item span {
+  display: none;
+}
+
+/* Center icons when collapsed */
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 1rem 0;
+  gap: 0;
+}
+
+/* ============================
+   MAIN CONTENT
+============================ */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  padding: 2.5rem 3rem;
+  overflow-y: auto;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.sidebar.collapsed ~ .main-content {
+  margin-left: 72px;
+}
+
+.main-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #a1a1aa;
+  margin-bottom: 3rem;
+}
+
+/* ============================
+   CONTENT SECTIONS
+============================ */
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #3b82f6;
+  padding-left: 0.5rem;
+}
+
+.empty {
+  color: #a1a1aa;
+  text-align: center;
+  font-style: italic;
+  padding: 2rem 0;
+}
+
+/* ============================
+   PODCAST CARDS
+============================ */
+.podcast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.75rem;
+}
+
+.podcast-card {
+  background-color: #18181b;
+  border: 1px solid #27272a;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.podcast-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 14px rgba(255, 255, 255, 0.05);
+}
+
+.podcast-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-bottom: 1px solid #27272a;
+}
+
+.podcast-card-content {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+}
+
+.podcast-card h3 {
+  color: #fafafa;
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ============================
+   TIP BUTTON
+============================ */
+.tip-button {
+  background-color: #f4f4f5;
+  color: #000;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  align-self: flex-start;
+}
+
+.tip-button:hover {
+  background-color: #e4e4e7;
+  transform: scale(1.05);
+}
+
+/* ============================
+   ABOUT SECTION
+============================ */
+.about-section {
+  text-align: center;
+  border-top: 1px solid #27272a;
+  padding-top: 2.5rem;
+  margin-top: 4rem;
+}
+
+.about-section p {
+  color: #a1a1aa;
+  max-width: 700px;
+  margin: 0.75rem auto;
+  line-height: 1.6;
+}
+
+/* ============================
+   SCROLLBAR
+============================ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #111;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #3f3f46;
+  border-radius: 10px;
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
