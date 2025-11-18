@@ -10,7 +10,7 @@ import {
   Info,
   Instagram,
   Youtube,
-  MessageCircle,,
+  MessageCircle,
   Menu,
   X,
 } from "lucide-react";
