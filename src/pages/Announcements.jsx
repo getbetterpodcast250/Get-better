@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+// src/pages/Announcements.jsx
+
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -8,41 +10,44 @@ import {
   FileText,
   Bell,
   Info,
+  Menu,
+  X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import PaymentModal from "../components/PaymentModal";
 import "../styles/Home.css";
 
+import { db } from "../firebase";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+
 export default function Announcements() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [announcements, setAnnouncements] = useState([]);
 
-  // Example announcements
-  const mockAnnouncements = [
-    {
-      title: "New Studio Equipment Arrived!",
-      date: "Feb 2, 2025",
-      description:
-        "We just upgraded our studio with new microphones and production tools for even better podcast quality.",
-      link: "https://example.com",
-    },
-    {
-      title: "Weekly Motivation Series Launch",
-      date: "Jan 28, 2025",
-      description:
-        "A new series of short motivational audio clips is coming this week. Stay tuned!",
-      link: "https://example.com",
-    },
-    {
-      title: "Community Q&A This Saturday",
-      date: "Jan 20, 2025",
-      description:
-        "Join our live Q&A session and ask anything about self-improvement, productivity, and creativity.",
-      link: "https://example.com",
-    },
-  ];
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const q = query(
+          collection(db, "announcements"),
+          orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(q);
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setAnnouncements(data);
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
 
   const navItems = [
     { icon: HomeIcon, label: "Home", path: "/" },
@@ -55,8 +60,21 @@ export default function Announcements() {
 
   return (
     <div className="app-container">
+      {/* MOBILE TOGGLE */}
+      <div
+        className="mobile-sidebar-toggle"
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        {mobileOpen ? <X size={26} /> : <Menu size={26} />}
+      </div>
+
       {/* SIDEBAR */}
-      <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+      <aside
+        className={`sidebar 
+          ${collapsed ? "collapsed" : ""} 
+          ${mobileOpen ? "mobile-open" : ""}
+        `}
+      >
         <div className="sidebar-header">
           {!collapsed && <h1>GET BETTER</h1>}
 
@@ -72,7 +90,10 @@ export default function Announcements() {
           {navItems.map((item) => (
             <button
               key={item.label}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                setMobileOpen(false);
+              }}
               className={`nav-item ${
                 item.label === "Announcements" ? "active-nav" : ""
               }`}
@@ -88,17 +109,21 @@ export default function Announcements() {
       <main className="main-content">
         <h1 className="main-title">Announcements</h1>
 
-        {mockAnnouncements.length > 0 ? (
+        {announcements.length > 0 ? (
           <div className="card-grid">
-            {mockAnnouncements.map((item, index) => (
+            {announcements.map((item) => (
               <div
-                key={index}
+                key={item.id}
                 className="card-item bg-zinc-800 rounded-2xl p-6 shadow-md flex flex-col justify-between
                 border border-white/20 shadow-lg shadow-white/5"
               >
                 <div>
                   <h3 className="text-xl font-semibold mb-1">{item.title}</h3>
-                  <p className="text-gray-400 text-sm mb-3">{item.date}</p>
+                  <p className="text-gray-400 text-sm mb-3">
+                    {item.createdAt?.toDate
+                      ? item.createdAt.toDate().toLocaleDateString()
+                      : ""}
+                  </p>
                   <p className="text-gray-300 text-sm">{item.description}</p>
                 </div>
 

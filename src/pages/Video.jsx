@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,35 +10,21 @@ import {
   Info,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
+
+import PaymentModal from "../components/PaymentModal";
 import "../styles/Home.css";
 
-export default function Video({ openPayment }) {
+export default function Video() {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
-  const demoVideos = [
-    {
-      id: 1,
-      title: "Interview with a Tech Innovator",
-      description: "A deep dive into the future of technology.",
-      thumbnail: "https://images.pexels.com/photos/1181355/pexels-photo-1181355.jpeg",
-      link: "https://youtu.be/abcd123",
-    },
-    {
-      id: 2,
-      title: "The Science of Well-Being",
-      description: "An expert discusses happiness and mental health.",
-      thumbnail: "https://images.pexels.com/photos/3182763/pexels-photo-3182763.jpeg",
-      link: "https://youtu.be/efgh456",
-    },
-    {
-      id: 3,
-      title: "Live Q&A: Your Questions Answered",
-      description: "We answer your most pressing questions about self-improvement.",
-      thumbnail: "https://images.pexels.com/photos/952437/pexels-photo-952437.jpeg",
-      link: "https://youtu.be/xyz789",
-    },
-  ];
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [showPayment, setShowPayment] = useState(false);
 
   const navItems = [
     { icon: HomeIcon, label: "Home", path: "/" },
@@ -49,8 +35,42 @@ export default function Video({ openPayment }) {
     { icon: Info, label: "About Us", path: "/about" },
   ];
 
+  // ------------ FETCH VIDEO PODCASTS FROM FIRESTORE ------------
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "video"));
+        const videoData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setVideos(videoData);
+      } catch (err) {
+        console.error("Error fetching video podcasts:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
+
   return (
     <div className="app-container">
+
+      {/* ============================
+          MOBILE SIDEBAR TOGGLE BUTTON
+      ============================= */}
+      <div
+        className="mobile-sidebar-toggle"
+        onClick={() => {
+          document.querySelector(".sidebar").classList.toggle("mobile-open");
+        }}
+      >
+        ☰
+      </div>
+
       {/* SIDEBAR */}
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="sidebar-header">
@@ -83,34 +103,56 @@ export default function Video({ openPayment }) {
       <main className="main-content">
         <h1 className="main-title">Video Podcasts</h1>
 
-        <div className="podcast-grid">
-          {demoVideos.map((video) => (
-            <div className="podcast-card" key={video.id}>
-              <a href={video.link} target="_blank" rel="noreferrer">
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="podcast-img"
-                />
-              </a>
+        {/* LOADING */}
+        {loading && <p className="empty">Loading videos...</p>}
 
-              <div className="podcast-card-content">
-                <h3>{video.title}</h3>
-                <p style={{ color: "#a1a1aa", marginBottom: "1rem" }}>
-                  {video.description}
-                </p>
+        {/* EMPTY STATE */}
+        {!loading && videos.length === 0 && (
+          <p className="empty">No video podcasts available</p>
+        )}
 
-                <button
-                  onClick={openPayment}
-                  className="tip-button"
+        {/* CONTENT */}
+        {!loading && videos.length > 0 && (
+          <div className="podcast-grid">
+            {videos.map((video) => (
+              <div className="podcast-card" key={video.id}>
+                <a
+                  href={video.podcastLink}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  Tip Us
-                </button>
+                  <img
+                    src={video.thumbnail}
+                    alt={video.title}
+                    className="podcast-img"
+                  />
+                </a>
+
+                <div className="podcast-card-content">
+                  <h3>{video.title}</h3>
+
+                  <p className="podcast-description">
+                    {video.description}
+                  </p>
+
+                  <button
+                    onClick={() => setShowPayment(true)}
+                    className="tip-button"
+                  >
+                    Tip Us
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
+
+      {/* PAYMENT MODAL */}
+      <PaymentModal
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+      />
     </div>
   );
 }

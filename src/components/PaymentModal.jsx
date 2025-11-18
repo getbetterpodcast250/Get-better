@@ -17,6 +17,26 @@ export default function PaymentModal({ isOpen, onClose }) {
     onClose();
   };
 
+  const renderPaymentDetails = () => {
+    if (method === "MTN Mobile Money") {
+      return (
+        <div className="bg-zinc-800 p-3 rounded-lg text-sm text-gray-300 space-y-1">
+          <p><strong>Tel:</strong> +250788598346</p>
+          <p><strong>Name:</strong> Dieudonne MASENGESHO</p>
+        </div>
+      );
+    }
+    if (method === "VISA") {
+      return (
+        <div className="bg-zinc-800 p-3 rounded-lg text-sm text-gray-300 space-y-1">
+          <p><strong>Card Number:</strong> 4713 7680 1485 2711</p>
+          <p><strong>Name:</strong> DIEUDONNE MASENGESHO </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="bg-zinc-900 text-white p-6 rounded-2xl shadow-lg w-96 relative">
@@ -59,9 +79,9 @@ export default function PaymentModal({ isOpen, onClose }) {
 
           <div>
             <label className="text-sm">Method</label>
-            <div className="flex justify-between mt-2">
-              {["MTN Mobile Money", "MOMO PAY", "AIRTEL MONEY"].map((m) => (
-                <label key={m} className="flex items-center space-x-1">
+            <div className="flex flex-col gap-2 mt-2">
+              {["MTN Mobile Money", "VISA", "AIRTEL MONEY"].map((m) => (
+                <label key={m} className="flex items-center space-x-2">
                   <input
                     type="radio"
                     name="method"
@@ -74,6 +94,8 @@ export default function PaymentModal({ isOpen, onClose }) {
               ))}
             </div>
           </div>
+
+          {renderPaymentDetails()}
 
           <button
             type="submit"

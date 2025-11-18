@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+// src/pages/Blogs.jsx
+
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,44 +14,32 @@ import {
 import { useNavigate } from "react-router-dom";
 import "../styles/Home.css";
 
+import { db } from "../firebase";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+
 export default function Blogs({ openPayment }) {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [blogs, setBlogs] = useState([]);
 
-  const demoBlogs = [
-    {
-      id: 1,
-      title: "10 Books That Will Change Your Life",
-      description:
-        "A curated list of must-read books for personal growth and development.",
-      thumbnail: "https://images.pexels.com/photos/1557238/pexels-photo-1557238.jpeg",
-      link: "#",
-      author: "Jane Doe",
-      date: "7/13/2024",
-    },
-    {
-      id: 2,
-      title: "How to Build a Morning Routine That Works",
-      description:
-        "Step-by-step guide to creating a morning ritual that sets you up for success.",
-      thumbnail:
-        "https://images.pexels.com/photos/3184431/pexels-photo-3184431.jpeg",
-      link: "#",
-      author: "John Smith",
-      date: "7/7/2024",
-    },
-    {
-      id: 3,
-      title: "Embracing Failure: The Key to Growth",
-      description:
-        "Why failure is not the opposite of success, but a part of it.",
-      thumbnail:
-        "https://images.pexels.com/photos/313690/pexels-photo-313690.jpeg",
-      link: "#",
-      author: "Emily White",
-      date: "7/1/2024",
-    },
-  ];
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const q = query(collection(db, "blogs"), orderBy("createdAt", "desc"));
+        const snapshot = await getDocs(q);
+        const blogData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBlogs(blogData);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   const navItems = [
     { icon: HomeIcon, label: "Home", path: "/" },
@@ -62,8 +52,21 @@ export default function Blogs({ openPayment }) {
 
   return (
     <div className="app-container">
+      {/* MOBILE TOGGLE */}
+      <div
+        className="mobile-sidebar-toggle"
+        onClick={() => setMobileOpen(!mobileOpen)}
+      >
+        ☰
+      </div>
+
       {/* SIDEBAR */}
-      <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+      <aside
+        className={`sidebar 
+          ${collapsed ? "collapsed" : ""} 
+          ${mobileOpen ? "mobile-open" : ""}
+        `}
+      >
         <div className="sidebar-header">
           {!collapsed && <h1>GET BETTER</h1>}
           <button
@@ -78,7 +81,10 @@ export default function Blogs({ openPayment }) {
           {navItems.map((item) => (
             <button
               key={item.label}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                navigate(item.path);
+                setMobileOpen(false); // close on mobile
+              }}
               className={`nav-item ${
                 item.label === "Blogs" ? "active-nav" : ""
               }`}
@@ -95,37 +101,44 @@ export default function Blogs({ openPayment }) {
         <h1 className="main-title">Blogs</h1>
 
         <div className="podcast-grid">
-          {demoBlogs.map((blog) => (
-            <div className="podcast-card" key={blog.id}>
-              <a href={blog.link} target="_blank" rel="noreferrer">
-                <img
-                  src={blog.thumbnail}
-                  alt={blog.title}
-                  className="podcast-img"
-                />
-              </a>
+          {blogs.length === 0 ? (
+            <p style={{ color: "#999" }}>No blogs available yet.</p>
+          ) : (
+            blogs.map((blog) => (
+              <div className="podcast-card" key={blog.id}>
+                <a href={blog.link} target="_blank" rel="noreferrer">
+                  <img
+                    src={blog.thumbnail}
+                    alt={blog.title}
+                    className="podcast-img"
+                  />
+                </a>
 
-              <div className="podcast-card-content">
-                <h3>{blog.title}</h3>
+                <div className="podcast-card-content">
+                  <h3>{blog.title}</h3>
 
-                <p style={{ color: "#a1a1aa", marginBottom: "0.6rem" }}>
-                  {blog.description}
-                </p>
+                  <p style={{ color: "#a1a1aa", marginBottom: "0.6rem" }}>
+                    {blog.description}
+                  </p>
 
-                <p style={{ fontSize: "0.85rem", color: "#777" }}>
-                  By {blog.author} on {blog.date}
-                </p>
+                  <p style={{ fontSize: "0.85rem", color: "#777" }}>
+                    {blog.author ? `By ${blog.author}` : "By Admin"}{" "}
+                    {blog.createdAt?.toDate
+                      ? `on ${blog.createdAt.toDate().toLocaleDateString()}`
+                      : ""}
+                  </p>
 
-                <button
-                  className="tip-button"
-                  onClick={openPayment}
-                  style={{ marginTop: "1rem" }}
-                >
-                  Tip Us
-                </button>
+                  <button
+                    className="tip-button"
+                    onClick={openPayment}
+                    style={{ marginTop: "1rem" }}
+                  >
+                    Tip Us
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </main>
     </div>

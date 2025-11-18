@@ -1,10 +1,16 @@
-/* Payment Modal Styles */
-
+/* Overlay: darkens background by 20% and centers modal */
 .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.2); /* 20% shade */
   backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
+/* Modal Container */
 .modal-container {
   background-color: #18181b;
   color: #fff;
@@ -13,8 +19,12 @@
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7);
   animation: fadeIn 0.25s ease;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1001;
 }
 
+/* Header */
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -28,6 +38,7 @@
   font-weight: 700;
 }
 
+/* Body */
 .modal-body {
   margin-top: 1rem;
 }
@@ -49,6 +60,7 @@
   border-color: #3b82f6;
 }
 
+/* Payment Methods */
 .payment-methods {
   display: flex;
   justify-content: space-around;
@@ -62,6 +74,18 @@
   font-size: 0.9rem;
 }
 
+/* Payment Details Box */
+.payment-details {
+  background-color: #27272a;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  color: #d4d4d8;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
 .send-btn {
   width: 100%;
   background-color: #f4f4f5;
@@ -90,6 +114,7 @@
   color: #fff;
 }
 
+/* Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
