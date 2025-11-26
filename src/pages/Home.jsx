@@ -41,10 +41,13 @@ export default function Home() {
   useEffect(() => {
     const fetchContent = async () => {
       try {
+        // Fetch audio, video, and blogs
         const audioSnap = await getDocs(query(collection(db, "audio"), orderBy("createdAt", "desc")));
         const videoSnap = await getDocs(query(collection(db, "video"), orderBy("createdAt", "desc")));
         const blogSnap = await getDocs(query(collection(db, "blogs"), orderBy("createdAt", "desc")));
-        const productsSnap = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
+        
+        // Fetch products - no ordering since there's no createdAt field in your structure
+        const productsSnap = await getDocs(collection(db, "products"));
 
         setAudio(audioSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         setVideo(videoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
@@ -132,6 +135,12 @@ export default function Home() {
     return data.length > 5 && (scrollPosition / 300) + 5 >= data.length;
   };
 
+  // Format WhatsApp number by removing spaces and special characters
+  const formatWhatsAppNumber = (contactInfo) => {
+    if (!contactInfo) return '';
+    return contactInfo.replace(/\s+/g, '').replace('+', '');
+  };
+
   return (
     <div className={`app-container ${showPayment ? 'modal-open' : ''}`}>
 
@@ -197,18 +206,22 @@ export default function Home() {
                     {getVisibleItems(section.data, section.scroll).map((item) => (
                       <div
                         key={item.id}
-                        className="podcast-card"
+                        className={`podcast-card ${section.type === 'products' ? 'product-card' : ''}`}
                         onClick={() => handleCardClick(item, section.type)}
                       >
-                        <img src={item.thumbnail || item.ImageLink} alt={item.title || item.ProductName} className="podcast-img" />
+                        <img 
+                          src={section.type === 'products' ? item.ImageLink : item.thumbnail} 
+                          alt={section.type === 'products' ? item.ProductName : item.title} 
+                          className="podcast-img" 
+                        />
                         <div className="podcast-card-content">
-                          <h3>{item.title || item.ProductName}</h3>
+                          <h3>{section.type === 'products' ? item.ProductName : item.title}</h3>
                           <p className="podcast-description">
-                            {item.description || `Price: ${item.Price}`}
+                            {section.type === 'products' ? `Price: ${item.Price}` : item.description}
                           </p>
                           {section.type === 'products' ? (
                             <a
-                              href={`https://wa.me/${item.ContactInfo}`}
+                              href={`https://wa.me/${formatWhatsAppNumber(item.ContactInfo)}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="contact-button"
