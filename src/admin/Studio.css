@@ -96,3 +96,69 @@
 .studio-inner {
   min-height: 100%;
 }
+
+.dashboard-section {
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
+.section-header h2 {
+  flex: 1;
+  margin: 0;
+}
+
+.section-content-wrapper {
+  overflow: hidden;
+}
+
+.section-content {
+  padding: 10px 15px;
+}
+
+.row-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.row-item:last-child {
+  border-bottom: none;
+}
+
+.row-thumb {
+  width: 70px;
+  height: 70px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.row-text h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.row-desc {
+  margin: 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.empty {
+  padding: 10px 0;
+  text-align: center;
+  color: #777;
+}
