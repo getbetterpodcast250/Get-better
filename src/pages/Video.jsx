@@ -7,6 +7,7 @@ import {
   Video as VideoIcon,
   FileText,
   Bell,
+  PackageSearch,
   Info,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -32,6 +33,7 @@ export default function Video() {
     { icon: VideoIcon, label: "Video Podcasts", path: "/video" },
     { icon: FileText, label: "Blogs", path: "/blogs" },
     { icon: Bell, label: "Announcements", path: "/announcements" },
+    { icon: PackageSearch, label: "Shop", path: "/shop" },
     { icon: Info, label: "About Us", path: "/about" },
   ];
 

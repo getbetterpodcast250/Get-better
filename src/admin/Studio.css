@@ -22,6 +22,7 @@
   padding: 30px;
   overflow-y: auto;
   position: relative;
+  flex: 1;
   z-index: 1;
 }
 
@@ -60,4 +61,38 @@
 .tab-link.active {
   background-color: #00ffd5;
   color: #000;
+}
+
+.pageBox {
+  background:#111;
+  border:1px solid #222;
+  padding:30px;
+  border-radius:14px;
+  width:100%;
+  max-width:500px;
+}
+
+.inputField {
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:7px;
+  background:#181818;
+  border:1px solid #282828;
+  color:white;
+}
+
+.submitBtn {
+  width:100%;
+  background:#3b82f6;
+  color:white;
+  padding:12px;
+  border:none;
+  border-radius:7px;
+  margin-top:16px;
+  cursor:pointer;
+}
+
+.studio-inner {
+  min-height: 100%;
 }

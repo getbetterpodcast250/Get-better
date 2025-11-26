@@ -2,10 +2,13 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
 import SidebarAdmin from "./component/SidebarAdmin";
 import Dashboard from "./component/Dashboard";
 import Upload from "./component/Upload";
 import BlogCanvas from "./component/BlogCanvas";
+import Market from "./component/Market";
+
 import "./Studio.css";
 
 export default function Studio() {
@@ -18,6 +21,7 @@ export default function Studio() {
       "/admin/studio",
       "/admin/studio/upload",
       "/admin/studio/blog",
+      "/admin/studio/market",
     ];
 
     const prevIndex = order.indexOf(prevPath.current);
@@ -29,12 +33,15 @@ export default function Studio() {
 
   const variants = {
     enter: (dir) => ({
-      x: dir > 0 ? 100 : -100,
+      x: dir > 0 ? 60 : -60,
       opacity: 0,
     }),
-    center: { x: 0, opacity: 1 },
+    center: {
+      x: 0,
+      opacity: 1,
+    },
     exit: (dir) => ({
-      x: dir > 0 ? -100 : 100,
+      x: dir > 0 ? -60 : 60,
       opacity: 0,
     }),
   };
@@ -51,27 +58,35 @@ export default function Studio() {
             <NavLink to="/admin/studio" end className="tab-link">
               Dashboard
             </NavLink>
+
             <NavLink to="/admin/studio/upload" className="tab-link">
               Upload
             </NavLink>
+
             <NavLink to="/admin/studio/blog" className="tab-link">
               Blog Canvas
+            </NavLink>
+
+            <NavLink to="/admin/studio/market" className="tab-link">
+              Market
             </NavLink>
           </div>
         </div>
 
         <AnimatePresence mode="wait" custom={direction}>
           <Routes location={location} key={location.pathname}>
+
             <Route
               index
               element={
                 <motion.div
+                  className="studio-inner"
                   custom={direction}
                   variants={variants}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.35 }}
                 >
                   <Dashboard />
                 </motion.div>
@@ -82,12 +97,13 @@ export default function Studio() {
               path="upload"
               element={
                 <motion.div
+                  className="studio-inner"
                   custom={direction}
                   variants={variants}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.35 }}
                 >
                   <Upload />
                 </motion.div>
@@ -98,19 +114,39 @@ export default function Studio() {
               path="blog"
               element={
                 <motion.div
+                  className="studio-inner"
                   custom={direction}
                   variants={variants}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.35 }}
                 >
                   <BlogCanvas />
                 </motion.div>
               }
             />
+
+            <Route
+              path="market"
+              element={
+                <motion.div
+                  className="studio-inner"
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.35 }}
+                >
+                  <Market />
+                </motion.div>
+              }
+            />
+
           </Routes>
         </AnimatePresence>
+
       </div>
     </div>
   );

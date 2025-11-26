@@ -1,0 +1,236 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ============================
+   CSS VARIABLES & RESET
+============================ */
+:root {
+  --color-bg-primary: #000000;
+  --color-bg-secondary: #18181b;
+  --color-bg-tertiary: #27272a;
+  
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #e4e4e7;
+  --color-text-muted: #a1a1aa;
+  
+  --color-accent: #3b82f6;
+  --color-hover: #27272a;
+  
+  --border-radius: 1rem;
+  --border-radius-sm: 0.5rem;
+  --transition: all 0.25s ease;
+  --shadow: 0 6px 14px rgba(255,255,255,0.05);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================
+   APP LAYOUT
+============================ */
+.appContainer {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+}
+
+/* ============================
+   SIDEBAR
+============================ */
+.sidebar {
+  background-color: var(--color-bg-secondary);
+  width: 240px;
+  min-width: 240px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--color-bg-tertiary);
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: var(--transition);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+  min-width: 70px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-bg-tertiary);
+  min-height: 70px;
+}
+
+.sidebar-header h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  transition: opacity .2s ease;
+}
+
+.sidebar.collapsed .sidebar-header h1 {
+  opacity: 0;
+  width: 0;
+}
+
+.collapse-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-sm);
+  transition: var(--transition);
+}
+
+.collapse-btn:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+/* ============================
+   NAV MENU
+============================ */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: .5rem 0;
+  gap: .25rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .9rem 1rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--color-text-secondary);
+  border: none;
+  background: transparent;
+}
+
+.nav-item:hover {
+  background-color: var(--color-hover);
+  color: var(--color-text-primary);
+}
+
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 1rem;
+  gap: 0;
+}
+
+/* ============================
+   MAIN CONTENT AREA
+============================ */
+.pageContainer {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px;
+  margin-left: 240px;
+  transition: margin-left .25s ease-in-out;
+}
+
+.sidebar.collapsed ~ .pageContainer {
+  margin-left: 70px;
+}
+
+/* ============================
+   SHOP PAGE
+============================ */
+.emptyBox {
+  background: #111;
+  border: 1px solid #2d2d2d;
+  margin-top: 30px;
+  padding: 45px;
+  border-radius: 14px;
+}
+
+.productGrid {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+  gap: 22px;
+}
+
+.productCard {
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 15px;
+}
+
+.productCard img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.price {
+  opacity: 0.8;
+  margin: 6px 0;
+}
+
+.contactButton {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  opacity: .8;
+  text-decoration: none;
+  color: white;
+}
+
+.contactButton:hover {
+  opacity: 1;
+}
+
+/* ============================
+   MOBILE TRIGGER
+============================ */
+.mobile-sidebar-toggle {
+  display: none;
+}
+
+@media (max-width:768px){
+  .mobile-sidebar-toggle {
+    position: fixed;
+    top:15px;
+    left:15px;
+    z-index:1500;
+    display:flex;
+    width:45px;
+    height:45px;
+    border-radius: var(--border-radius-sm);
+    border:1px solid var(--color-bg-tertiary);
+    background: var(--color-bg-secondary);
+    align-items:center;
+    justify-content:center;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .pageContainer {
+    margin-left:0!important;
+  }
+}

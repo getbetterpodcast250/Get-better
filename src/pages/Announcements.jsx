@@ -9,6 +9,7 @@ import {
   Video as VideoIcon,
   FileText,
   Bell,
+  PackageSearch,
   Info,
   Menu,
   X,
@@ -55,6 +56,7 @@ export default function Announcements() {
     { icon: VideoIcon, label: "Video Podcasts", path: "/video" },
     { icon: FileText, label: "Blogs", path: "/blogs" },
     { icon: Bell, label: "Announcements", path: "/announcements" },
+    { icon: PackageSearch, label: "Shop", path: "/shop" },
     { icon: Info, label: "About Us", path: "/about" },
   ];
 

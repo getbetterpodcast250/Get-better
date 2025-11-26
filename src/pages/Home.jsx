@@ -7,10 +7,13 @@ import {
   Video,
   FileText,
   Bell,
+  PackageSearch,
   Info,
   Instagram,
   Youtube,
   MessageCircle,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PaymentModal from "../components/PaymentModal";
@@ -27,6 +30,13 @@ export default function Home() {
   const [audio, setAudio] = useState([]);
   const [video, setVideo] = useState([]);
   const [blogs, setBlogs] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  // Scroll states for each section
+  const [videoScroll, setVideoScroll] = useState(0);
+  const [productsScroll, setProductsScroll] = useState(0);
+  const [audioScroll, setAudioScroll] = useState(0);
+  const [blogsScroll, setBlogsScroll] = useState(0);
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -34,10 +44,12 @@ export default function Home() {
         const audioSnap = await getDocs(query(collection(db, "audio"), orderBy("createdAt", "desc")));
         const videoSnap = await getDocs(query(collection(db, "video"), orderBy("createdAt", "desc")));
         const blogSnap = await getDocs(query(collection(db, "blogs"), orderBy("createdAt", "desc")));
+        const productsSnap = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
 
         setAudio(audioSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         setVideo(videoSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
         setBlogs(blogSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        setProducts(productsSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
       } catch (error) {
         console.error("Error fetching content:", error);
       }
@@ -47,9 +59,10 @@ export default function Home() {
   }, []);
 
   const sections = [
-    { title: "Recent Audio Podcasts", data: audio, type: "audio" },
-    { title: "Recent Video Podcasts", data: video, type: "video" },
-    { title: "Recent Blogs", data: blogs, type: "blog" },
+    { title: "Video Podcasts", data: video, type: "video", scroll: videoScroll, setScroll: setVideoScroll },
+    { title: "Our Products", data: products, type: "products", scroll: productsScroll, setScroll: setProductsScroll },
+    { title: "Audio Podcasts", data: audio, type: "audio", scroll: audioScroll, setScroll: setAudioScroll },
+    { title: "Blogs", data: blogs, type: "blog", scroll: blogsScroll, setScroll: setBlogsScroll },
   ];
 
   const navItems = [
@@ -58,39 +71,40 @@ export default function Home() {
     { icon: Video, label: "Video Podcasts", path: "/video" },
     { icon: FileText, label: "Blogs", path: "/blogs" },
     { icon: Bell, label: "Announcements", path: "/announcements" },
+    { icon: PackageSearch, label: "Shop", path: "/shop" },
     { icon: Info, label: "About Us", path: "/about" },
   ];
 
   const contactIcons = [
-  {
-    icon: MessageCircle,
-    href: "https://wa.me/250788598346",
-    label: "WhatsApp",
-    color: "hover:text-green-400"
-  },
-  {
-    icon: Instagram,
-    href: "https://www.instagram.com/getbetterpodcast1/",
-    label: "Instagram",
-    color: "hover:text-pink-500"
-  },
-  {
-    icon: Youtube,
-    href: "https://youtube.com/@lightdeen-c1s?si=yOyDbqAYi5AfSoT8",
-    label: "YouTube",
-    color: "hover:text-red-500"
-  }
- ];
-
+    {
+      icon: MessageCircle,
+      href: "https://wa.me/250788598346",
+      label: "WhatsApp",
+      color: "hover:text-green-400"
+    },
+    {
+      icon: Instagram,
+      href: "https://www.instagram.com/getbetterpodcast1/",
+      label: "Instagram",
+      color: "hover:text-pink-500"
+    },
+    {
+      icon: Youtube,
+      href: "https://youtube.com/@lightdeen-c1s?si=yOyDbqAYi5AfSoT8",
+      label: "YouTube",
+      color: "hover:text-red-500"
+    }
+  ];
 
   const handleCardClick = (item, contentType) => {
-    if (item.contentLink) {
-      window.open(item.contentLink, '_blank', 'noopener,noreferrer');
+    if (item.podcastLink || item.link) {
+      window.open(item.podcastLink || item.link, '_blank', 'noopener,noreferrer');
     } else {
       switch (contentType) {
         case 'audio': navigate('/audio'); break;
         case 'video': navigate('/video'); break;
         case 'blog': navigate('/blogs'); break;
+        case 'products': navigate('/shop'); break;
         default: navigate('/');
       }
     }
@@ -101,12 +115,27 @@ export default function Home() {
     setShowPayment(true);
   };
 
+  const scrollSection = (section, direction) => {
+    const scrollAmount = 300;
+    const newScroll = direction === 'right' 
+      ? section.scroll + scrollAmount 
+      : Math.max(0, section.scroll - scrollAmount);
+    
+    section.setScroll(newScroll);
+  };
+
+  const getVisibleItems = (data, scrollPosition) => {
+    return data.slice(scrollPosition / 300, (scrollPosition / 300) + 5);
+  };
+
+  const showViewMore = (data, scrollPosition) => {
+    return data.length > 5 && (scrollPosition / 300) + 5 >= data.length;
+  };
+
   return (
     <div className={`app-container ${showPayment ? 'modal-open' : ''}`}>
 
-      {/* ============================
-          MOBILE SIDEBAR TOGGLE BUTTON
-      ============================= */}
+      {/* MOBILE SIDEBAR TOGGLE BUTTON */}
       <div
         className="mobile-sidebar-toggle"
         onClick={() => {
@@ -151,22 +180,77 @@ export default function Home() {
             {section.data.length === 0 ? (
               <p className="empty">No Available Content</p>
             ) : (
-              <div className="podcast-grid">
-                {section.data.map((item) => (
-                  <div
-                    key={item.id}
-                    className="podcast-card"
-                    onClick={() => handleCardClick(item, section.type)}
+              <div className="section-container">
+                {/* Left Arrow */}
+                {section.scroll > 0 && (
+                  <button 
+                    className="scroll-arrow left-arrow"
+                    onClick={() => scrollSection(section, 'left')}
                   >
-                    <img src={item.thumbnail} alt={item.title} className="podcast-img" />
-                    <div className="podcast-card-content">
-                      <h3>{item.title}</h3>
-                      <button onClick={handleTipClick} className="tip-button">
-                        Tip Us
-                      </button>
-                    </div>
+                    <ArrowLeft className="w-6 h-6" />
+                  </button>
+                )}
+
+                {/* Content */}
+                <div className="scrollable-content">
+                  <div className="podcast-grid">
+                    {getVisibleItems(section.data, section.scroll).map((item) => (
+                      <div
+                        key={item.id}
+                        className="podcast-card"
+                        onClick={() => handleCardClick(item, section.type)}
+                      >
+                        <img src={item.thumbnail || item.ImageLink} alt={item.title || item.ProductName} className="podcast-img" />
+                        <div className="podcast-card-content">
+                          <h3>{item.title || item.ProductName}</h3>
+                          <p className="podcast-description">
+                            {item.description || `Price: ${item.Price}`}
+                          </p>
+                          {section.type === 'products' ? (
+                            <a
+                              href={`https://wa.me/${item.ContactInfo}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="contact-button"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MessageCircle size={17} />
+                              Contact Seller
+                            </a>
+                          ) : (
+                            <button onClick={handleTipClick} className="tip-button">
+                              Tip Us
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* View More Card */}
+                    {showViewMore(section.data, section.scroll) && (
+                      <div 
+                        className="view-more-card"
+                        onClick={() => navigate(`/${section.type === 'products' ? 'shop' : section.type}`)}
+                      >
+                        <div className="view-more-content">
+                          <h3>View More</h3>
+                          <p>See all {section.title.toLowerCase()}</p>
+                          <ArrowRight className="w-8 h-8 mt-2" />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
+
+                {/* Right Arrow */}
+                {section.data.length > 5 && (section.scroll / 300) + 5 < section.data.length && (
+                  <button 
+                    className="scroll-arrow right-arrow"
+                    onClick={() => scrollSection(section, 'right')}
+                  >
+                    <ArrowRight className="w-6 h-6" />
+                  </button>
+                )}
               </div>
             )}
           </div>

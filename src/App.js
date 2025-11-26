@@ -9,6 +9,7 @@ import Video from "./pages/Video";
 import Blogs from "./pages/Blogs";
 import Announcements from "./pages/Announcements";
 import About from "./pages/About";
+import Shop from "./pages/Shop"; 
 
 // Admin Studio
 import Studio from "./admin/Studio";
@@ -30,21 +31,17 @@ export default function App() {
         <Route path="/blogs" element={<Blogs />} />
         <Route path="/announcements" element={<Announcements />} />
         <Route path="/about" element={<About />} />
+        <Route path="/shop" element={<Shop />} />
 
         {/* Admin Auth Routes */}
         <Route path="/admin" element={<AdminLogin />} />
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/reset-password" element={<AdminResetPassword />} />
 
-        {/* Protected Studio Route */}
-        <Route
-          path="/admin/studio/*"
-          element={
-            <ProtectedRoute>
-              <Studio />
-            </ProtectedRoute>
-          }
-        />
+        {/* Protected Studio Routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/admin/studio/*" element={<Studio />} />
+        </Route>
       </Routes>
     </Router>
   );
