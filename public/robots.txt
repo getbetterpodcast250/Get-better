@@ -1,3 +1,9 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+
+Disallow: /admin/
+Disallow: /admin/signup
+Disallow: /admin/reset-password
+Disallow: /admin/studio/
+
+Sitemap: https://getbetterpodcast.web.app/sitemap.xml
