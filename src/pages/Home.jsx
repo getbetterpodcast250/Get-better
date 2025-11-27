@@ -38,7 +38,33 @@ export default function Home() {
   const [audioScroll, setAudioScroll] = useState(0);
   const [blogsScroll, setBlogsScroll] = useState(0);
 
+  // SEO metadata
+  const pageTitle = "Get Better Podcast - Personal Growth & Self Improvement";
+  const pageDescription = "Everyday and in every way I am getting better and better. Explore our podcasts, blogs, and products for personal development.";
+  const pageKeywords = "podcast, self improvement, personal growth, mental health, productivity, motivation, audio podcasts, video podcasts, blogs";
+
   useEffect(() => {
+    // Update document title and meta tags for SEO
+    document.title = pageTitle;
+    
+    // Update meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = "description";
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = pageDescription;
+
+    // Update meta keywords
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.name = "keywords";
+      document.head.appendChild(metaKeywords);
+    }
+    metaKeywords.content = pageKeywords;
+
     const fetchContent = async () => {
       try {
         // Fetch audio, video, and blogs
@@ -143,6 +169,21 @@ export default function Home() {
 
   return (
     <div className={`app-container ${showPayment ? 'modal-open' : ''}`}>
+      {/* Add structured data for SEO */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Get Better Podcast",
+          "description": pageDescription,
+          "url": window.location.origin,
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${window.location.origin}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+          }
+        })}
+      </script>
 
       {/* MOBILE SIDEBAR TOGGLE BUTTON */}
       <div
@@ -150,6 +191,7 @@ export default function Home() {
         onClick={() => {
           document.querySelector(".sidebar").classList.toggle("mobile-open");
         }}
+        aria-label="Toggle navigation menu"
       >
         ☰
       </div>
@@ -158,15 +200,24 @@ export default function Home() {
       <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
         <div className="sidebar-header">
           {!collapsed && <h1>GET BETTER</h1>}
-          <button className="collapse-btn" onClick={() => setCollapsed(!collapsed)}>
+          <button 
+            className="collapse-btn" 
+            onClick={() => setCollapsed(!collapsed)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
             {collapsed ? <ChevronRight /> : <ChevronLeft />}
           </button>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className="sidebar-nav" aria-label="Main navigation">
           {navItems.map((item) => (
-            <button key={item.label} className="nav-item" onClick={() => navigate(item.path)}>
-              <item.icon className="w-5 h-5" />
+            <button 
+              key={item.label} 
+              className="nav-item" 
+              onClick={() => navigate(item.path)}
+              aria-label={`Navigate to ${item.label}`}
+            >
+              <item.icon className="w-5 h-5" aria-hidden="true" />
               {!collapsed && <span>{item.label}</span>}
             </button>
           ))}
@@ -175,16 +226,18 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="main-content">
-        <div className="hero-section">
+        {/* Hero Section with proper heading structure */}
+        <header className="hero-section" role="banner">
           <h1 className="main-title">GET BETTER PODCAST</h1>
           <p className="subtitle">
             Everyday and in every way I am getting better and better and better.
           </p>
-        </div>
+        </header>
 
+        {/* Content Sections */}
         {sections.map((section) => (
-          <div key={section.title} className="section">
-            <h2 className="section-title">{section.title}</h2>
+          <section key={section.title} className="section" aria-labelledby={`section-${section.type}`}>
+            <h2 id={`section-${section.type}`} className="section-title">{section.title}</h2>
 
             {section.data.length === 0 ? (
               <p className="empty">No Available Content</p>
@@ -195,24 +248,29 @@ export default function Home() {
                   <button 
                     className="scroll-arrow left-arrow"
                     onClick={() => scrollSection(section, 'left')}
+                    aria-label={`Scroll ${section.title} left`}
                   >
-                    <ArrowLeft className="w-6 h-6" />
+                    <ArrowLeft className="w-6 h-6" aria-hidden="true" />
                   </button>
                 )}
 
                 {/* Content */}
                 <div className="scrollable-content">
-                  <div className="podcast-grid">
+                  <div className="podcast-grid" role="list" aria-label={`List of ${section.title}`}>
                     {getVisibleItems(section.data, section.scroll).map((item) => (
-                      <div
+                      <article
                         key={item.id}
                         className={`podcast-card ${section.type === 'products' ? 'product-card' : ''}`}
                         onClick={() => handleCardClick(item, section.type)}
+                        role="listitem"
                       >
                         <img 
                           src={section.type === 'products' ? item.ImageLink : item.thumbnail} 
                           alt={section.type === 'products' ? item.ProductName : item.title} 
                           className="podcast-img" 
+                          loading="lazy"
+                          width="300"
+                          height="200"
                         />
                         <div className="podcast-card-content">
                           <h3>{section.type === 'products' ? item.ProductName : item.title}</h3>
@@ -226,17 +284,22 @@ export default function Home() {
                               rel="noopener noreferrer"
                               className="contact-button"
                               onClick={(e) => e.stopPropagation()}
+                              aria-label={`Contact seller about ${item.ProductName}`}
                             >
-                              <MessageCircle size={17} />
+                              <MessageCircle size={17} aria-hidden="true" />
                               Contact Seller
                             </a>
                           ) : (
-                            <button onClick={handleTipClick} className="tip-button">
+                            <button 
+                              onClick={handleTipClick} 
+                              className="tip-button"
+                              aria-label="Support us with a tip"
+                            >
                               Tip Us
                             </button>
                           )}
                         </div>
-                      </div>
+                      </article>
                     ))}
                     
                     {/* View More Card */}
@@ -244,11 +307,14 @@ export default function Home() {
                       <div 
                         className="view-more-card"
                         onClick={() => navigate(`/${section.type === 'products' ? 'shop' : section.type}`)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`View more ${section.title}`}
                       >
                         <div className="view-more-content">
                           <h3>View More</h3>
                           <p>See all {section.title.toLowerCase()}</p>
-                          <ArrowRight className="w-8 h-8 mt-2" />
+                          <ArrowRight className="w-8 h-8 mt-2" aria-hidden="true" />
                         </div>
                       </div>
                     )}
@@ -260,18 +326,19 @@ export default function Home() {
                   <button 
                     className="scroll-arrow right-arrow"
                     onClick={() => scrollSection(section, 'right')}
+                    aria-label={`Scroll ${section.title} right`}
                   >
-                    <ArrowRight className="w-6 h-6" />
+                    <ArrowRight className="w-6 h-6" aria-hidden="true" />
                   </button>
                 )}
               </div>
             )}
-          </div>
+          </section>
         ))}
 
         {/* About Section */}
-        <div className="about-section">
-          <h2>About Us</h2>
+        <section className="about-section" aria-labelledby="about-heading">
+          <h2 id="about-heading">About Us</h2>
           <div className="about-content">
             <p>
               <strong>Our Mission:</strong> To empower individuals through insightful conversations
@@ -282,10 +349,10 @@ export default function Home() {
               every day — mentally, emotionally, and professionally.
             </p>
           </div>
-        </div>
+        </section>
 
         {/* Footer */}
-        <footer className="footer">
+        <footer className="footer" role="contentinfo">
           <div className="footer-icons">
             {contactIcons.map((contact, index) => (
               <a
@@ -294,13 +361,13 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`contact-item ${contact.color}`}
-                aria-label={contact.label}
+                aria-label={`Follow us on ${contact.label}`}
               >
-                <contact.icon className="w-6 h-6" />
+                <contact.icon className="w-6 h-6" aria-hidden="true" />
               </a>
             ))}
           </div>
-          <p>© 2025 NAD PRODUCTION. Developed and All right is reserved</p>
+          <p>© 2025 NAD PRODUCTION. Proudly Developed by NAD PRODUCTION and All right is reserved</p>
         </footer>
       </main>
 
